@@ -4,6 +4,8 @@
 	- [开源仓库](#开源仓库)
 		- [识别算法配置](#识别算法配置)
 	- [算法测试](#算法测试)
+		- [训练数据](#训练数据)
+		- [测试模型](#测试模型)
 	- [相关算法](#相关算法)
 	- [数据集](#数据集)
 	- [参考文献](#参考文献)
@@ -14,6 +16,7 @@
 
 ## 开源仓库
 - **InsightFace:** [https://github.com/deepinsight/insightface](https://github.com/deepinsight/insightface)<br>
+- **作者演讲：**[https://www.bilibili.com/video/av54356295?t=785](https://www.bilibili.com/video/av54356295?t=785)
 
 ### 识别算法配置
 1. 安装mxnet
@@ -63,19 +66,60 @@ CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network mnas05 --loss triple
 ````
 多GPU训练可以使用``train_parall.py``文件进行多GPU加速。
 
+- **<font color ="red" size=4 face="TimesNewRoman">*人脸识别为一分类网络，insight face训练先在大数据集上使用ArcFace损失函数做分类训练，然后再使用Triplet损失函数进行微调提高识别精度。*</font>**
+
 ## 算法测试
+
+### 训练数据
+
 1. 直接训练(MS1MV2-Arcface)数据集，基于MobileFaceNet网络和ArcFace损失函数进行训练。
 ````
 CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network y1 --loss arcface --dataset emore
 ````
-训练配置
+- 训练配置<br>
+作者的训练配置如下所示：
 ````
-Namespace(batch_size=256, ckpt=3, ctx_num=1, dataset='emore', frequent=20, image_channel=3, kvstore='device', loss='arcface', lr=0.1, lr_steps='100000,160000,220000', models_root='./models', mom=0.9, network='y1', per_batch_size=256, pretrained='', pretrained_epoch=1, rescale_threshold=0, verbose=2000, wd=0.0005) {'loss_m1': 1.0, 'loss_m2': 0.5, 'loss_m3': 0.0, 'net_act': 'prelu', 'emb_size': 128, 'data_rand_mirror': True, 'loss_name': 'margin_softmax', 'val_targets': ['lfw', 'cfp_fp', 'agedb_30'], 'ce_loss': True, 'net_input': 1, 'image_shape': [112, 112, 3], 'net_blocks': [1, 4, 6, 2], 'fc7_lr_mult': 1.0, 'ckpt_embedding': True, 'net_unit': 3, 'net_output': 'GDC', 'count_flops': True, 'num_workers': 1, 'batch_size': 256, 'memonger': False, 'data_images_filter': 0, 'dataset': 'emore', 'num_classes': 85742, 'fc7_no_bias': False, 'loss': 'arcface', 'data_color': 0, 'loss_s': 64.0, 'dataset_path': '../datasets/faces_emore', 'data_cutoff': False, 'net_se': 0, 'net_multiplier': 1.0, 'fc7_wd_mult': 1.0, 'network': 'y1', 'per_batch_size': 256, 'net_name': 'fmobilefacenet', 'workspace': 256, 'max_steps': 0, 'bn_mom': 0.9}
-('in_network', {'loss_m1': 1.0, 'loss_m2': 0.5, 'loss_m3': 0.0, 'net_act': 'prelu', 'emb_size': 128, 'data_rand_mirror': True, 'loss_name': 'margin_softmax', 'val_targets': ['lfw', 'cfp_fp', 'agedb_30'], 'ce_loss': True, 'net_input': 1, 'image_shape': [112, 112, 3], 'net_blocks': [1, 4, 6, 2], 'fc7_lr_mult': 1.0, 'ckpt_embedding': True, 'net_unit': 3, 'net_output': 'GDC', 'count_flops': True, 'num_workers': 1, 'batch_size': 256, 'memonger': False, 'data_images_filter': 0, 'dataset': 'emore', 'num_classes': 85742, 'fc7_no_bias': False, 'loss': 'arcface', 'data_color': 0, 'loss_s': 64.0, 'dataset_path': '../datasets/faces_emore', 'data_cutoff': False, 'net_se': 0, 'net_multiplier': 1.0, 'fc7_wd_mult': 1.0, 'network': 'y1', 'per_batch_size': 256, 'net_name': 'fmobilefacenet', 'workspace': 256, 'max_steps': 0, 'bn_mom': 0.9})
+Namespace(batch_size=512, beta=1000.0, beta_freeze=0, beta_min=5.0, bn_mom=0.9, ckpt=1, ctx_num=4, cutoff=0, data_dir='/cache/jiaguo/faces_ms1mi_112x112', easy_margin=0, emb_size=512, end_epoch=100000, fc7_wd_mult=1.0, gamma=0.12, image_channel=3, image_h=112, image_w=112, loss_type=5, lr=0.1, lr_steps='100000,140000,160000', margin=4, margin_a=1.0, margin_b=0.2, margin_m=0.3, margin_s=64.0, max_steps=0, mom=0.9, network='r100', num_classes=85742, num_layers=100, per_batch_size=128, power=1.0, prefix='../models2/model-r100-ii/model', pretrained='', rand_mirror=1, rescale_threshold=0, scale=0.9993, target='lfw,cfp_fp,agedb_30', use_deformable=0, verbose=2000, version_act='prelu', version_input=1, version_output='E', version_se=0, version_unit=3, wd=0.0005)
 ````
-训练结果
+- 训练结果<br>
+作者得到的训练结果如下所示：
+````
+testing verification..
+(12000, 512)
+infer time 21.69233
+[lfw][168000]XNorm: 22.172497
+[lfw][168000]Accuracy-Flip: 0.99783+-0.00269
+testing verification..
+(14000, 512)
+infer time 24.988244
+[cfp_fp][168000]XNorm: 21.383092
+[cfp_fp][168000]Accuracy-Flip: 0.98271+-0.00569
+testing verification..
+(12000, 512)
+infer time 21.44195
+[agedb_30][168000]XNorm: 22.695239
+[agedb_30][168000]Accuracy-Flip: 0.98233+-0.00716
+[168000]Accuracy-Highest: 0.98283
 ````
 
+### 测试模型
+
+- **MegaFace测试**<br>
+下载MegaFace的评估工具[devkit.tar.gz](http://megaface.cs.washington.edu/dataset/download/content/devkit.tar.gz),
+从[网盘](https://pan.baidu.com/s/1h4ezfwJiXClbZDdg1RX0MQ)中下载MegaFace测试数据*megaface_testpack_v1.0.zip*，解压后文件夹中包含的数据有
+````
+facescrub_images/
+megaface_images/
+facescrub_lst
+facescrub_lst_all
+facescrub_noises.txt
+facescrub_noises_empty.txt
+megaface_lst
+megaface_noises.txt
+megaface_noises_empty.txt
+````
+在工程的`./Evaluation/Megaface/`文件夹中，运行`./run.sh`文件，测试模型在MegaFace数据集上的识别精度。运行`./run.sh`前，先修改devkit的路径`DEVKIT`,将`DEVKIT="/raid5data/dplearn/megaface/devkit/experiments"`修改为``DEVKIT="/($PWD)/devkit/experiments"``，修改后，可以得到模型在MegaFace数据集上的识别精度,测试模型需要花费较长时间。
+````
 ````
 
 
@@ -88,6 +132,7 @@ Namespace(batch_size=256, ckpt=3, ctx_num=1, dataset='emore', frequent=20, image
 ## 数据集
 - **LFW:** [http://vis-www.cs.umass.edu/lfw/](http://vis-www.cs.umass.edu/lfw/)
 - **CFP:** [http://www.cfpw.io/index.html](http://www.cfpw.io/index.html)
+- **AgeDB** [https://ibug.doc.ic.ac.uk/resources/agedb/](https://ibug.doc.ic.ac.uk/resources/agedb/)
 - **MegaFace:** [http://megaface.cs.washington.edu/](http://megaface.cs.washington.edu/)
 - **MS-Celeb-1M:** [https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/)
 
