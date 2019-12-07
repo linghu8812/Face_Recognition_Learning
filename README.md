@@ -105,6 +105,11 @@ infer time 21.44195
 ### 测试模型
 
 - **MegaFace测试**<br>
+需要安装的依赖项：
+```
+tbb2 opencv2.4
+```
+如果高版本cuda不支持`opencv2.4`，将`FindCUDA.cmake`替换为最新版的[FindCUDA.cmake](https://github.com/opencv/opencv/blob/master/cmake/FindCUDA.cmake)，如果不支持`compute_20`，将`OpenCVDetectCUDA.cmake`替换为最新版的[OpenCVDetectCUDA.cmake](https://github.com/opencv/opencv/blob/master/cmake/OpenCVDetectCUDA.cmake)，
 下载MegaFace的评估工具[devkit.tar.gz](http://megaface.cs.washington.edu/dataset/download/content/devkit.tar.gz),
 从[网盘](https://pan.baidu.com/s/1h4ezfwJiXClbZDdg1RX0MQ)中下载MegaFace测试数据*megaface_testpack_v1.0.zip*，解压后文件夹中包含的数据有
 ````
@@ -118,8 +123,22 @@ megaface_lst
 megaface_noises.txt
 megaface_noises_empty.txt
 ````
-在工程的`./Evaluation/Megaface/`文件夹中，运行`./run.sh`文件，测试模型在MegaFace数据集上的识别精度。运行`./run.sh`前，先修改devkit的路径`DEVKIT`,将`DEVKIT="/raid5data/dplearn/megaface/devkit/experiments"`修改为``DEVKIT="/($PWD)/devkit/experiments"``，修改后，可以得到模型在MegaFace数据集上的识别精度,测试模型需要花费较长时间。
+在工程的`./Evaluation/Megaface/`文件夹中，运行`./run.sh`文件，测试模型在MegaFace数据集上的识别精度。运行`./run.sh`前，先修改devkit的路径`DEVKIT`,将`DEVKIT="/raid5data/dplearn/megaface/devkit/experiments"`改为`devkit/experiments`实际所在的位置，修改后，可以得到模型在MegaFace数据集上的识别精度，测试模型需要花费较长时间。
 ````
+Done matching! Score matrix size: 3530 1000000
+Saving to ../../mx_results/otherFiles/facescrub_megaface_r100ii_1000000_1.bin
+Computing test results with 1000000 images for set 1
+Loaded 3530 probes spanning 80 classes
+Loading from ../../mx_results/otherFiles/facescrub_facescrub_r100ii.bin
+Probe score matrix size: 3530 3530
+distractor score matrix size: 3530 1000000
+Done loading. Time to compute some stats!
+Finding top distractors!
+Done sorting distractor scores
+Making gallery!
+Done Making Gallery!
+Allocating ranks (1000080)
+Rank 1: 0.983584
 ````
 
 
