@@ -3,9 +3,9 @@
 - [**InsightFace算法学习**](#insightface算法学习)
 	- [开源仓库](#开源仓库)
 		- [识别算法配置](#识别算法配置)
-	- [算法测试](#算法测试)
-		- [训练数据](#训练数据)
-		- [测试模型](#测试模型)
+		- [模型训练](#模型训练)
+		- [模型评估](#模型评估)
+	- [评估结果](#评估结果)
 	- [相关算法](#相关算法)
 	- [数据集](#数据集)
 	- [参考文献](#参考文献)
@@ -19,35 +19,42 @@
 - **作者演讲：**[https://www.bilibili.com/video/av54356295?t=785](https://www.bilibili.com/video/av54356295?t=785)
 
 ### 识别算法配置
-1. 安装mxnet
+**1. 安装mxnet**
 ````
 pip install mxnet-cu80 #or mxnet-cu90 or mxnet-cu100
 ````
-2. 下载insightface算法仓库
+**2. 下载insightface算法仓库**
 ````
 git clone --recursive https://github.com/deepinsight/insightface.git
 ````
-3. 下载(MS1MV2-Arcface)数据集，数据集里包含以下内容
+**3. 下载(MS1MV2-Arcface)数据集<br>**
+数据集下载地址在：[https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ](https://pan.baidu.com/s/1S6LJZGdqcZRle1vlcMzHOQ)，数据集里包含以下内容
 ````
 faces_emore/
        train.idx
        train.rec
        property
        lfw.bin
+       cfp_ff.bin
        cfp_fp.bin
        agedb_30.bin
+       calfw.bin
+       cplfw.bin
+       vgg2_fp.bin
 ````
-4. 复制配置文件
+**4. 复制配置文件**
 ````
 cp sample_config.py config.py
 vim config.py # edit dataset path etc..
 ````
-5. 配置环境变量
+可以将`config.py`文件中的这一行`dataset.emore.val_targets = ['lfw', 'cfp_fp', 'agedb_30']`修改为：`dataset.emore.val_targets = ['lfw', 'cfp_ff', 'cfp_fp', 'agedb_30']`，在训练评估是可以同时评估cpf_ff数据集。
+
+**5. 配置环境变量**
 ````
 export MXNET_CPU_WORKER_NTHREADS=24
 export MXNET_ENGINE_TYPE=ThreadedEnginePerDevice
 ````
-6. 模型训练
+**6. 模型训练**
 - 训练LResNet100E-IR网络，损失函数为ArcFace。
 ````
 CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network r100 --loss arcface --dataset emore
@@ -66,23 +73,14 @@ CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network mnas05 --loss triple
 ````
 多GPU训练可以使用``train_parall.py``文件进行多GPU加速。
 
-- **<font color ="red" size=4 face="TimesNewRoman">*人脸识别为一分类网络，insight face训练先在大数据集上使用ArcFace损失函数做分类训练，然后再使用Triplet损失函数进行微调提高识别精度。*</font>**
-
-## 算法测试
-
-### 训练数据
-
-1. 直接训练(MS1MV2-Arcface)数据集，基于MobileFaceNet网络和ArcFace损失函数进行训练。
-````
-CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network y1 --loss arcface --dataset emore
-````
-- 训练配置<br>
-作者的训练配置如下所示：
+### 模型训练
+**1. 训练配置**<br>
+作者的训练配置如下所示：每张卡上的batch size为128，共使用4张卡进行训练，故batch size为512。
 ````
 Namespace(batch_size=512, beta=1000.0, beta_freeze=0, beta_min=5.0, bn_mom=0.9, ckpt=1, ctx_num=4, cutoff=0, data_dir='/cache/jiaguo/faces_ms1mi_112x112', easy_margin=0, emb_size=512, end_epoch=100000, fc7_wd_mult=1.0, gamma=0.12, image_channel=3, image_h=112, image_w=112, loss_type=5, lr=0.1, lr_steps='100000,140000,160000', margin=4, margin_a=1.0, margin_b=0.2, margin_m=0.3, margin_s=64.0, max_steps=0, mom=0.9, network='r100', num_classes=85742, num_layers=100, per_batch_size=128, power=1.0, prefix='../models2/model-r100-ii/model', pretrained='', rand_mirror=1, rescale_threshold=0, scale=0.9993, target='lfw,cfp_fp,agedb_30', use_deformable=0, verbose=2000, version_act='prelu', version_input=1, version_output='E', version_se=0, version_unit=3, wd=0.0005)
 ````
-- 训练结果<br>
-作者得到的训练结果如下所示：
+**2. 训练结果**<br>
+作者在LFW、CFP和AgeDB30数据集上得到的训练结果如下所示：
 ````
 testing verification..
 (12000, 512)
@@ -102,9 +100,8 @@ infer time 21.44195
 [168000]Accuracy-Highest: 0.98283
 ````
 
-### 测试模型
-
-- **MegaFace测试**<br>
+### 模型评估
+**1. MegaFace数据集评估**<br>
 需要安装的依赖项：
 ```
 tbb2 opencv2.4
@@ -141,7 +138,62 @@ Allocating ranks (1000080)
 Rank 1: 0.983584
 ````
 
+**2. LFW, CFP, AgeDB数据集评估**<br>
+进入`./recognition/eval/`文件夹，输入以下命令，使用`verification.py`文件进行评估。需要指定模型所在的文件夹和评估数据所在的文件夹。
+````
+python verification.py --model ../../models/model-r100-ii/model --data-dir ../../datasets/faces_emore/
+````
+得到的结果如下所示：
+````
+(12000, 512)
+infer time 108.986159
+[lfw]XNorm: 22.132480
+[lfw]Accuracy: 0.00000+-0.00000
+[lfw]Accuracy-Flip: 0.99767+-0.00281
+Max of [lfw] is 0.99767
+testing verification..
+(14000, 512)
+infer time 121.617964
+[cfp_ff]XNorm: 21.077436
+[cfp_ff]Accuracy: 0.00000+-0.00000
+[cfp_ff]Accuracy-Flip: 0.99843+-0.00162
+Max of [cfp_ff] is 0.99843
+testing verification..
+(14000, 512)
+infer time 122.128096
+[cfp_fp]XNorm: 21.340035
+[cfp_fp]Accuracy: 0.00000+-0.00000
+[cfp_fp]Accuracy-Flip: 0.98271+-0.00559
+Max of [cfp_fp] is 0.98271
+testing verification..
+(12000, 512)
+infer time 104.282227
+[agedb_30]XNorm: 22.654594
+[agedb_30]Accuracy: 0.00000+-0.00000
+[agedb_30]Accuracy-Flip: 0.98250+-0.00712
+Max of [agedb_30] is 0.98250
+````
 
+- **<font color ="red" size=4 face="TimesNewRoman">*人脸识别为一分类网络，insight face训练先在大数据集上使用ArcFace损失函数做分类训练，然后再使用Triplet损失函数进行微调提高识别精度。*</font>**
+
+## 评估结果
+**1. 作者开源模型**
+<center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
+ ---|---|---|---|---|---
+<center>LResNet100E-IR</center>|<center>99.77</center>|<center>99.84</center>|<center>98.27</center>|<center>98.25</center>|<center>98.35</center>
+<center>LResNet50E-IR</center>|<center>99.80</center>|<center>99.83</center>|<center>92.17</center>|<center>97.70</center>|<center>97.26</center>
+<center>LResNet34E-IR</center>|<center>99.67</center>|<center>99.83</center>|<center>90.71</center>|<center>97.63</center>|<center>96.09</center>
+<center>MobileFaceNet</center>|<center>99.45</center>|<center>99.49</center>|<center>89.77</center>|<center>95.72</center>|<center>88.63</center>
+
+**2. 基于MS1M-ArcFace训练模型**
+<center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
+ ---|---|---|---|---|---
+<center>MobileFaceNet*</center>|<center>99.52</center>|<center>99.44</center>|<center>94.24</center>|<center>96.23</center>|<center></center>
+
+**3. VSP模型**
+<center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
+ ---|---|---|---|---|---
+<center>LResNet100E-IR*</center>|<center>99.82</center>|<center>99.81</center>|<center>98.50</center>|<center>98.12</center>|<center>98.14</center>
 
 ## 相关算法
 - **人脸检测：** RetinaFace<br>
