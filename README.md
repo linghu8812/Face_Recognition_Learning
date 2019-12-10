@@ -47,7 +47,7 @@ faces_emore/
 cp sample_config.py config.py
 vim config.py # edit dataset path etc..
 ````
-可以将`config.py`文件中的这一行`dataset.emore.val_targets = ['lfw', 'cfp_fp', 'agedb_30']`修改为：`dataset.emore.val_targets = ['lfw', 'cfp_ff', 'cfp_fp', 'agedb_30']`，在训练评估是可以同时评估cpf_ff数据集。
+*可以将`config.py`文件中的这一行`dataset.emore.val_targets = ['lfw', 'cfp_fp', 'agedb_30']`修改为：`dataset.emore.val_targets = ['lfw', 'cfp_ff', 'cfp_fp', 'agedb_30']`，在训练评估时可以同时评估cpf_ff数据集，想看模型在该数据集上的准确率可以加上，该数据集上的准确率与LFW的准确率接近*。
 
 **5. 配置环境变量**
 ````
@@ -188,7 +188,7 @@ Max of [agedb_30] is 0.98250
 **2. 基于MS1M-ArcFace训练模型**
 <center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
  ---|---|---|---|---|---
-<center>MobileFaceNet*</center>|<center>99.52</center>|<center>99.44</center>|<center>94.24</center>|<center>96.23</center>|<center></center>
+<center>MobileFaceNet*</center>|<center>99.52</center>|<center>99.44</center>|<center>94.24</center>|<center>96.23</center>|<center>90.51</center>
 
 **3. VSP模型**
 <center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
@@ -199,6 +199,8 @@ Max of [agedb_30] is 0.98250
 - **人脸检测：** RetinaFace<br>
 - **人脸对齐：** Dense U-Net<br>
 - **人脸识别：** ArcFace<br>
+&emsp;&emsp;根据文献[1]，文章首先介绍了三种利用卷积神经网络识别人脸的主要属性。先是训练数据，介绍了主要的人脸识别训练数据集；其次是网络结构，介绍了各种卷积神经网络；第三是损失函数，介绍了基于欧几里得距离的损失函数和基于角度和余弦的损失函数。<br>
+&emsp;&emsp;文章介绍了从SoftMax到ArcFace损失函数。介绍了：(1)SoftMax损失函数；(2)权重归一化；(3)Angular Margin倍数损失函数；(4)特征归一化；(5)Cosine Margin损失函数；(6)Angular Margin损失函数；
 
 ## 数据集
 - **LFW:** [http://vis-www.cs.umass.edu/lfw/](http://vis-www.cs.umass.edu/lfw/)
