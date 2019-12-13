@@ -1,18 +1,16 @@
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [**InsightFace算法学习**](#insightface算法学习)
+- [**InsightFace算法配置**](#insightface算法配置)
 	- [开源仓库](#开源仓库)
 		- [识别算法配置](#识别算法配置)
 		- [模型训练](#模型训练)
 		- [模型评估](#模型评估)
 	- [评估结果](#评估结果)
-	- [相关算法](#相关算法)
 	- [数据集](#数据集)
-	- [参考文献](#参考文献)
 
 <!-- /TOC -->
 
-# **InsightFace算法学习**
+# **InsightFace算法配置**
 
 ## 开源仓库
 - **InsightFace:** [https://github.com/deepinsight/insightface](https://github.com/deepinsight/insightface)<br>
@@ -63,20 +61,32 @@ export MXNET_ENGINE_TYPE=ThreadedEnginePerDevice
 
 - 训练LResNet100E-IR网络，损失函数为ArcFace。
 ````
-CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network r100 --loss arcface --dataset emore
+CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network r100 --loss arcface --dataset emore  2>&1 | tee log.txt
 ````
 - 训练LResNet50E-IR网络，损失函数为CosineFace。
 ````
-CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network r50 --loss cosface --dataset emore
+CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network r50 --loss cosface --dataset emore  2>&1 | tee log.txt
 ````
 - 训练MobileFaceNet网络，损失函数为Softmax。
 ````
-CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network y1 --loss softmax --dataset emore
+CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network y1 --loss softmax --dataset emore  2>&1 | tee log.txt
 ````
 - Fine tune MobileFaceNet网络, 损失函数改为Triplet loss。
 ````
-CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network mnas05 --loss triplet --lr 0.005 --pretrained ./models/y1-softmax-emore,1
+CUDA_VISIBLE_DEVICES='0,1,2,3' python -u train.py --network mnas05 --loss triplet --lr 0.005 --pretrained ./models/y1-softmax-emore,1  2>&1 | tee log.txt
 ````
+- **<font color ="red" size=4 face="TimesNewRoman">*训练Triplet Loss时，需要在`train.py`文件中的这一行*</font>**<br>
+```
+model = mx.mod.Module(
+		context=ctx,
+		symbol=sym,
+)
+```
+- **<font color ="red" size=4 face="TimesNewRoman">*后面增加*</font>**<br>
+```
+model.bind([("data", (args.batch_size, args.image_channel, image_size[0], image_size[1]))], [("softmax_label", (args.batch_size,))])
+```
+- **<font color ="red" size=4 face="TimesNewRoman">*这一句话，否则训练会报错！！！*</font>**<br>
 
 多GPU训练可以使用``train_parall.py``文件进行多GPU加速。
 作者的训练配置如下所示：每张卡上的batch size为128，共使用4张卡进行训练，故batch size为512。
@@ -109,7 +119,7 @@ infer time 21.44195
 **1. MegaFace数据集评估**<br>
 需要安装的依赖项：
 ```
-tbb2 opencv2.4
+opencv2.4
 ```
 如果高版本cuda不支持`opencv2.4`，将`FindCUDA.cmake`替换为最新版的[FindCUDA.cmake](https://github.com/opencv/opencv/blob/master/cmake/FindCUDA.cmake)，如果不支持`compute_20`，将`OpenCVDetectCUDA.cmake`替换为最新版的[OpenCVDetectCUDA.cmake](https://github.com/opencv/opencv/blob/master/cmake/OpenCVDetectCUDA.cmake)，
 下载MegaFace的评估工具[devkit.tar.gz](http://megaface.cs.washington.edu/dataset/download/content/devkit.tar.gz),
@@ -198,14 +208,8 @@ Max of [agedb_30] is 0.98250
 **3. VSP模型**
 <center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
  ---|---|---|---|---|---
-<center>LResNet100E-IR*</center>|<center>99.82</center>|<center>99.81</center>|<center>98.50</center>|<center>98.12</center>|<center>98.14</center>
-
-## 相关算法
-- **人脸检测：** RetinaFace<br>
-- **人脸对齐：** Dense U-Net<br>
-- **人脸识别：** ArcFace<br>
-&emsp;&emsp;根据文献[1]，文章首先介绍了三种利用卷积神经网络识别人脸的主要属性。先是训练数据，介绍了主要的人脸识别训练数据集；其次是网络结构，介绍了各种卷积神经网络；第三是损失函数，介绍了基于欧几里得距离的损失函数和基于角度和余弦的损失函数。<br>
-&emsp;&emsp;文章介绍了从SoftMax到ArcFace损失函数。介绍了：(1)SoftMax损失函数；(2)权重归一化；(3)Angular Margin倍数损失函数；(4)特征归一化；(5)Cosine Margin损失函数；(6)Angular Margin损失函数；
+<center>LResNet100E-IR-1*</center>|<center>99.82</center>|<center>99.81</center>|<center>98.50</center>|<center>98.12</center>|<center>98.14</center>
+<center>LResNet100E-IR-2*</center>|<center>99.82</center>|<center>99.84</center>|<center>94.45</center>|<center>98.03</center>|<center>97.33</center>
 
 ## 数据集
 - **LFW:** [http://vis-www.cs.umass.edu/lfw/](http://vis-www.cs.umass.edu/lfw/)
@@ -213,12 +217,3 @@ Max of [agedb_30] is 0.98250
 - **AgeDB** [https://ibug.doc.ic.ac.uk/resources/agedb/](https://ibug.doc.ic.ac.uk/resources/agedb/)
 - **MegaFace:** [http://megaface.cs.washington.edu/](http://megaface.cs.washington.edu/)
 - **MS-Celeb-1M:** [https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/)
-
-
-## 参考文献
-[1] **ArcFace:** Additive Angular Margin Loss for Deep Face Recognition, Jiankang Deng, Jia Guo, Niannan Xue,
-Stefanos Zafeiriou, [https://arxiv.org/abs/1801.07698](https://arxiv.org/abs/1801.07698)<br>
-[2] **RetinaFace:** Single-stage Dense Face Localisation in the Wild, Jiankang Deng, Jia Guo, Yuxiang Zhou,
-Jinke Yu, Irene Kotsia, Stefanos Zafeiriou, [https://arxiv.org/abs/1905.00641](https://arxiv.org/abs/1905.00641)<br>
-[3] Stacked **Dense U-Nets** with Dual Transformers for Robust Face Alignment, Jia Guo, Jiankang Deng,
-Niannan Xue, Stefanos Zafeiriou, [https://arxiv.org/abs/1812.01936](https://arxiv.org/abs/1812.01936)<br>
