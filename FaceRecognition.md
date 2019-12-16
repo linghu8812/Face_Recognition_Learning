@@ -203,7 +203,11 @@ Max of [agedb_30] is 0.98250
 **2. 基于MS1M-ArcFace训练模型**
 <center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
  ---|---|---|---|---|---
-<center>MobileFaceNet*</center>|<center>99.52</center>|<center>99.44</center>|<center>94.24</center>|<center>96.23</center>|<center>90.51</center>
+<center>MobileFaceNet*</center>|<center>99.52<br>99.52</center>|<center>99.44<br>99.50</center>|<center>94.24<br>93.89</center>|<center>96.23<br>96.48</center>|<center>**90.51**<br>90.42</center>
+<center>MobileFaceNet-triplet*</center>|<center>99.50</center>|<center>99.44</center>|<center>94.87</center>|<center>96.83</center>|<center>90.10</center>
+<center>LResNet100E-IR</center>|<center>99.73</center>|<center>99.85</center>|<center>97.63</center>|<center>97.85</center>|<center></center>
+<center>LResNet50E-IR</center>|<center>99.68</center>|<center>99.81</center>|<center>96.89</center>|<center>97.70</center>|<center>96.38</center>
+<center>LResNet34E-IR</center>|<center>**99.78**</center>|<center>99.80</center>|<center>**97.19**</center>|<center>**98.02**</center>|<center>**97.36**</center>
 
 **3. VSP模型**
 <center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
