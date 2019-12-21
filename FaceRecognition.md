@@ -204,10 +204,12 @@ Max of [agedb_30] is 0.98250
 <center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
  ---|---|---|---|---|---
 <center>MobileFaceNet*</center>|<center>99.52<br>99.52</center>|<center>99.44<br>99.50</center>|<center>94.24<br>93.89</center>|<center>96.23<br>96.48</center>|<center>**90.51**<br>90.42</center>
-<center>MobileFaceNet-triplet*</center>|<center>99.50</center>|<center>99.44</center>|<center>94.87</center>|<center>96.83</center>|<center>90.10</center>
-<center>LResNet100E-IR</center>|<center>99.73</center>|<center>99.85</center>|<center>97.63</center>|<center>97.85</center>|<center></center>
-<center>LResNet50E-IR</center>|<center>99.68</center>|<center>99.81</center>|<center>96.89</center>|<center>97.70</center>|<center>96.38</center>
-<center>LResNet34E-IR</center>|<center>**99.78**</center>|<center>99.80</center>|<center>**97.19**</center>|<center>**98.02**</center>|<center>**97.36**</center>
+<center><font color ="red">MobileFaceNet-triplet*</font></center>|<center>99.50</center>|<center>99.44</center>|<center>94.87</center>|<center>96.83</center>|<center><font color ="red">90.10</font></center>
+<center>LResNet100E-IR*</center>|<center>99.73</center>|<center>99.85</center>|<center>97.63</center>|<center>97.85</center>|<center>97.22</center>
+<center>LResNet50E-IR*</center>|<center>99.68</center>|<center>99.81</center>|<center>96.89</center>|<center>97.70</center>|<center>96.38</center>
+<center>LResNet34E-IR*</center>|<center>**99.78**</center>|<center>99.80</center>|<center>**97.19**</center>|<center>**98.02**</center>|<center>**97.36**</center>
+<center>MobileNet*</center>|<center>99.60</center>|<center>99.63</center>|<center>94.74</center>|<center>96.62</center>|<center>92.92</center>
+<center>MnasNet*</center>|<center>99.55<br>99.58</center>|<center>99.64<br>99.69</center>|<center>95.19<br>95.19</center>|<center>96.62<br>96.90</center>|<center>93.47<br>93.72</center>
 
 **3. VSP模型**
 <center>模型</center>| LFW | CFP-FF | CFP-FP | AgeDB-30 | MegaFace
@@ -221,3 +223,6 @@ Max of [agedb_30] is 0.98250
 - **AgeDB** [https://ibug.doc.ic.ac.uk/resources/agedb/](https://ibug.doc.ic.ac.uk/resources/agedb/)
 - **MegaFace:** [http://megaface.cs.washington.edu/](http://megaface.cs.washington.edu/)
 - **MS-Celeb-1M:** [https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/)
+- **Trillion Pairs** [http://trillionpairs.deepglint.com/overview](http://trillionpairs.deepglint.com/overview)
+- **NIST FRVT 1:1** [https://pages.nist.gov/frvt/html/frvt11.html](https://pages.nist.gov/frvt/html/frvt11.html)
+- **IQIYI** [http://challenge.ai.iqiyi.com/detail?raceId=5afc36639689443e8f815f9e](http://challenge.ai.iqiyi.com/detail?raceId=5afc36639689443e8f815f9e)
